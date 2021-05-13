@@ -1,14 +1,12 @@
+// entry js file
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-// Declearing the mongodb Client
-// const MongoClient = require('mongodb').MongoClient;
 
-// Declearing the Connection Path
+// mongoose set up and database connection
 const connectionPath =
   'mongodb+srv://jamesIweobi:killbill@cluster0.ysfmd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-
-// New Mongo client instance
 
 app.use(express.json());
 mongoose.connect(
@@ -21,10 +19,7 @@ mongoose.connect(
   }
 );
 
-app.get('/', (req, res) => {
-  res.send('sent!');
-});
-
+// database Schema files
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongoose connectio error!'));
 const Schema = mongoose.Schema;
@@ -38,6 +33,7 @@ const agentModel = new Schema({
 
 var Agent = mongoose.model('Agent', agentModel);
 
+// application routes || request and response functions
 app.post('/agents', (req, res) => {
   const reqBody = req.body;
   Agent.create(
@@ -97,31 +93,7 @@ app.put('/agents/:id', (req, res) => {
   );
 });
 
-app.get('/agents/:id', (req, res) => {
-  Agent.findById({ _id: req.params.id }, (err, agent) => {
-    if (err) {
-      return res.status(500).json({ message: err });
-    } else if (!agent) {
-      return res.status(404).json({ message: 'Agents not found!!!' });
-    } else {
-      return res.status(200).json({ agent });
-    }
-  });
-});
-
-app.delete('/agents/:id', (req, res) => {
-  Agent.findById(req.params.id, (err, agent) => {
-    if (err) {
-      return res.status(500).json({ message: err });
-    } else if (!agent) {
-      return res.status(404).json({ message: 'Agents not found!!!' });
-    } else {
-      agent.delete();
-      return res.status(200).json({ message: 'Agent deletion successful' });
-    }
-  });
-});
-
+// Node server
 app.listen(5200, () => {
   console.log('server running on PORT: 5200');
 });
