@@ -20,9 +20,11 @@ mongoose.connect(
     }
   }
 );
+
 app.get('/', (req, res) => {
   res.send('sent!');
 });
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongoose connectio error!'));
 const Schema = mongoose.Schema;
@@ -94,75 +96,31 @@ app.put('/agents/:id', (req, res) => {
     }
   );
 });
-// app.get();
-// // Route to fetch data from the database
-// app.get('/contacts', (req, res) => {
-//   // routing the get request through the client
-//   client.connect((err, connectedClient) => {
-//     if (err) return res.status(500).json({ message: err });
-//     const database = connectedClient.db();
-//     database
-//       .collection('contacts')
-//       .find({})
-//       .toArray((err, result) => {
-//         if (err) return res.status(500).json({ message: err });
-//         return res.status(200).json({
-//           clients: result,
-//           message: 'List of Contacts',
-//         });
-//       });
-//   });
-// });
 
-// // to create create a new contact entry
+app.get('/agents/:id', (req, res) => {
+  Agent.findById({ _id: req.params.id }, (err, agent) => {
+    if (err) {
+      return res.status(500).json({ message: err });
+    } else if (!agent) {
+      return res.status(404).json({ message: 'Agents not found!!!' });
+    } else {
+      return res.status(200).json({ agent });
+    }
+  });
+});
 
-// app.post('/contacts', (req, res) => {
-//   client.connect((err, connectedClient) => {
-//     if (err) return res.status(500).json({ message: err });
-//     const db = connectedClient.db();
-//     db.collection('contacts').insertOne(
-//       {
-//         // fetching the new contact from the request body
-//         name: req.body.name,
-//         job: req.body.job,
-//         years: req.body.years,
-//       },
-//       (err, result) => {
-//         if (err) return res.status(500).json({ message: err });
-//         return res
-//           .status(200)
-//           .json({ message: 'New contact added to the data-Base' });
-//       }
-//     );
-//   });
-// });
-
-// app.get('/contacts', (req, res) => {
-//   client.connect((err, connectedClient) => {
-//     if (err) return res.status(500).json({ message: err });
-//     const db = connectedClient.db();
-//     db.collection('contacts').findOneAndUpdate(
-//       {
-//         name: req.body.name,
-//       },
-//       (err, result) => {
-//         if (err) return res.status(500).json({ message: err });
-//         return res.status(200).json({ client: result });
-//       }
-//     );
-//   });
-// });
-
-// app.put('/contact', (req, res)=>{
-//   client.connect((err, connectedClient)=>{
-//     if(err)return res.status(500).json({message:err});
-//     const db = connectedClient.db()
-//     return res.status(200).json({client: result});
-//   })
-// })
-// // .put can edit / update
-// // .delete for delting
-// // .get by id and update
+app.delete('/agents/:id', (req, res) => {
+  Agent.findById(req.params.id, (err, agent) => {
+    if (err) {
+      return res.status(500).json({ message: err });
+    } else if (!agent) {
+      return res.status(404).json({ message: 'Agents not found!!!' });
+    } else {
+      agent.delete();
+      return res.status(200).json({ message: 'Agent deletion successful' });
+    }
+  });
+});
 
 app.listen(5200, () => {
   console.log('server running on PORT: 5200');
